@@ -6,7 +6,7 @@ DEFAULT_IMG_SIZE = (100, 100)
 class Player(pygame.sprite.Sprite):
     def __init__(self, width, height):
         super().__init__()
-        self.img = pygame.image.load("mario.png").convert_alpha()
+        self.img = pygame.image.load("images/mario.png").convert_alpha()
         self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
         self.rect = self.img.get_rect()
         self.WIDTH = width

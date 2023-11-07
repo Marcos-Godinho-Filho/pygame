@@ -7,8 +7,11 @@ DEFAULT_IMG_SIZE = (75, 75)
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, width, height):
         super().__init__()
-        self.img = pygame.image.load("bowser.png")
-        self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE).convert_alpha()
+
+        array = ["images/bowser.png", "images/super.png", "images/turtle.png"]
+        self.img = pygame.image.load(array[random.randint(0, 2)]).convert_alpha()
+        self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
+        
         self.rect = self.img.get_rect()
         self.WIDTH = width
         self.HEIGHT = height
