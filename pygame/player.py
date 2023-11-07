@@ -9,12 +9,12 @@ class Player(pygame.sprite.Sprite):
         self.img = pygame.image.load("mario.png").convert_alpha()
         self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
         self.rect = self.img.get_rect()
-        self.rect.center = (
-            (width-self.img.get_width())/2,
-            (height-self.img.get_height())/2
-        )
         self.WIDTH = width
         self.HEIGHT = height
+        self.rect.center = (
+            (self.WIDTH - self.img.get_width())/2,
+            (self.HEIGHT - self.img.get_height())/2
+        )
 
 
     def update(self):
