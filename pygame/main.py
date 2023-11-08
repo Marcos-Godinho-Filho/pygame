@@ -11,10 +11,10 @@ FPS = 60
 framesPerSec = pygame.time.Clock()
 
 pygame.font.init()                           
-FONT = pygame.font.SysFont("Monospace", 15, True, True)             
+FONT = pygame.font.SysFont("Monospace", 28, True, True)             
 
 BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
+WHITE = (230, 240, 250)
 
 WIDTH = 1200
 HEIGHT = 600
@@ -36,6 +36,9 @@ PLAYER = Player(WIDTH, HEIGHT)
 enemies = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PLAYER)
+
+img = pygame.image.load("images/background.png").convert_alpha()
+img = pygame.transform.scale(img, (WIDTH, HEIGHT))
 
 
 def add_enemy():
@@ -59,11 +62,12 @@ while running:
             add_enemy()
 
         if event.type == UPDATECOUNTER:         
-            txt = FONT.render(f"Pontuação: {counter}", False, BLACK)  
-            DISPLAYSURF.blit(txt, (50, 50)) 
             counter += 1
 
-    DISPLAYSURF.fill(WHITE)
+    DISPLAYSURF.blit(img, (0,0))
+
+    txt = FONT.render(f"Pontuação: {counter}", False, WHITE)  
+    DISPLAYSURF.blit(txt, (50, 50)) 
 
     for entity in all_sprites:
         entity.draw(DISPLAYSURF)

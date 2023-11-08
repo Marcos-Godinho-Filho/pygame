@@ -29,9 +29,9 @@ class Enemy(pygame.sprite.Sprite):
             )
     
         if self.way == 0 or self.way == 2:
-            self.speed = random.randint(1, 5)
+            self.speed = random.randint(3, 7)
         elif self.way == 1 or self.way == 3:
-            self.speed = random.randint(-5, -1)
+            self.speed = random.randint(-7, -3)
 
 
     def update(self):
