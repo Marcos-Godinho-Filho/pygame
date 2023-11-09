@@ -1,7 +1,7 @@
 import sys
 import pygame
-from pygame import font
 from enemy import Enemy
+from fruit import Fruit
 from player import Player
 from pygame.locals import *
 
@@ -31,9 +31,15 @@ counter = 0
 UPDATECOUNTER = pygame.USEREVENT + 2
 pygame.time.set_timer(UPDATECOUNTER, 1000)
 
+points = 0
+
+ADDFRUIT = pygame.USEREVENT + 3
+pygame.time.set_timer(ADDFRUIT, 5000)
+
 PLAYER = Player(WIDTH, HEIGHT)
 
 enemies = pygame.sprite.Group()
+fruits = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PLAYER)
 
@@ -47,36 +53,62 @@ def add_enemy():
     all_sprites.add(new_enemy)
 
 
+def add_fruit():
+    new_fruit = Fruit(WIDTH, HEIGHT)
+    fruits.add(new_fruit)
+    all_sprites.add(new_fruit)
+
+
+def write_in_screen(text, width, height):
+    txt = FONT.render(text, False, WHITE) 
+    DISPLAYSURF.blit(txt, (width, height))
+
+
 running = True
+lose = False
 while running:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
 
-        if event.type == pygame.QUIT:
+        elif event.type == pygame.QUIT:
             running = False
 
-        if event.type == ADDENEMY:
+        elif event.type == ADDENEMY:
             add_enemy()
             add_enemy()
 
-        if event.type == UPDATECOUNTER:         
-            counter += 1
+        elif event.type == UPDATECOUNTER:
+            if not lose:         
+                counter += 1
+
+        elif event.type == ADDFRUIT:
+            add_fruit()
 
     DISPLAYSURF.blit(img, (0,0))
 
-    txt = FONT.render(f"Pontuação: {counter}", False, WHITE)  
-    DISPLAYSURF.blit(txt, (50, 50)) 
+    write_in_screen(f"Tempo: {counter}s", 50, 50)
+    write_in_screen(f"Pontuação: {points}", 50, 60)
 
     for entity in all_sprites:
         entity.draw(DISPLAYSURF)
 
     if pygame.sprite.spritecollideany(PLAYER, enemies):
         PLAYER.kill()
-        running = False
+        lose = True
+
+    for f in fruits:
+        if pygame.sprite.spritecollideany(PLAYER, f):
+            f.kill()
+            points += 1;
+
+    if lose:
+        write_in_screen(f"Você perdeu! Pontuação: {points}", (WIDTH/2, HEIGHT/2))
+        write_in_screen(f"Pressione [ESC] para sair", WIDTH/2 - 5, HEIGHT/2) 
 
     enemies.update()
+    fruits.update()
     PLAYER.update()
 
     pygame.display.update()
