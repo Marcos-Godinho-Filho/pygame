@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-DEFAULT_IMG_SIZE = (100, 100)
+DEFAULT_IMG_SIZE = (75, 75)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, width, height):
@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
             (self.WIDTH - self.img.get_width())/2,
             (self.HEIGHT - self.img.get_height())/2
         )
+        self.hp = 10
 
 
     def update(self):

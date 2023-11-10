@@ -23,15 +23,15 @@ class Fruit(pygame.sprite.Sprite):
     def update(self):
         self.c += 1
         if (self.up):
-            self.rect.move_ip(0, -5)
+            self.rect.move_ip(0, -1)
         else:
-            self.rect.move_ip(0, 5)
-        if (self.c == 100):
+            self.rect.move_ip(0, 1)
+        if (self.c == 5):
             if (self.up):
                 self.up = False
             else:
                 self.up = True
-            c = 0
+            self.c = 0
 
 
     def draw(self, surface):

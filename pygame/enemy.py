@@ -2,7 +2,7 @@ import random
 import pygame
 from pygame.locals import *
 
-DEFAULT_IMG_SIZE = (75, 75)
+DEFAULT_IMG_SIZE = (50, 50)
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, width, height):

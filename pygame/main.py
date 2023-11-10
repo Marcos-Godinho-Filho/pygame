@@ -14,29 +14,42 @@ pygame.font.init()
 FONT = pygame.font.SysFont("Monospace", 28, True, True)             
 
 BLACK = (0, 0, 0)
+BLUE = (30, 30, 250)
+RED = (250, 30, 30)
 WHITE = (230, 240, 250)
 
-WIDTH = 1200
+WIDTH = 1000
 HEIGHT = 600
 
 DISPLAYSURF = pygame.display.set_mode((WIDTH, HEIGHT))
 DISPLAYSURF.fill(WHITE)
 pygame.display.set_caption("GAME")
 
+#events
+
 ADDENEMY = pygame.USEREVENT + 1
-pygame.time.set_timer(ADDENEMY, 2000)
-
-counter = 0
-
-UPDATECOUNTER = pygame.USEREVENT + 2
-pygame.time.set_timer(UPDATECOUNTER, 1000)
+pygame.time.set_timer(ADDENEMY, 1000)
 
 points = 0
 
-ADDFRUIT = pygame.USEREVENT + 3
+ADDFRUIT = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDFRUIT, 5000)
 
+counter = 0
+
+UPDATECOUNTER = pygame.USEREVENT + 3
+pygame.time.set_timer(UPDATECOUNTER, 1000)
+
+difficulty = 1
+
+UPDATEDIFICULTY = pygame.USEREVENT + 4
+pygame.time.set_timer(UPDATEDIFICULTY, 15000)
+
+#sprites
+
 PLAYER = Player(WIDTH, HEIGHT)
+
+c = 0
 
 enemies = pygame.sprite.Group()
 fruits = pygame.sprite.Group()
@@ -46,6 +59,7 @@ all_sprites.add(PLAYER)
 img = pygame.image.load("images/background.png").convert_alpha()
 img = pygame.transform.scale(img, (WIDTH, HEIGHT))
 
+#useful functions
 
 def add_enemy():
     new_enemy = Enemy(WIDTH, HEIGHT)
@@ -59,10 +73,11 @@ def add_fruit():
     all_sprites.add(new_fruit)
 
 
-def write_in_screen(text, width, height):
-    txt = FONT.render(text, False, WHITE) 
+def write_in_screen(text, width, height, color = WHITE):
+    txt = FONT.render(text, False, color) 
     DISPLAYSURF.blit(txt, (width, height))
 
+#main
 
 running = True
 lose = False
@@ -76,36 +91,50 @@ while running:
             running = False
 
         elif event.type == ADDENEMY:
-            add_enemy()
-            add_enemy()
+            for i in range(0, difficulty):
+                add_enemy()
+
+        elif event.type == ADDFRUIT:
+            add_fruit()
 
         elif event.type == UPDATECOUNTER:
             if not lose:         
                 counter += 1
 
-        elif event.type == ADDFRUIT:
-            add_fruit()
+        elif event.type == UPDATEDIFICULTY:
+            if not lose:
+                difficulty += 1
 
     DISPLAYSURF.blit(img, (0,0))
 
-    write_in_screen(f"Tempo: {counter}s", 50, 50)
-    write_in_screen(f"Pontuação: {points}", 50, 60)
+    if not lose:
+        write_in_screen(f"Tempo: {counter}s", 50, 50)
+        write_in_screen(f"Pontuação: {points}", 50, 75, BLUE)
+        write_in_screen(f"Vida: {PLAYER.hp}", 50, 100, RED)
 
     for entity in all_sprites:
         entity.draw(DISPLAYSURF)
 
     if pygame.sprite.spritecollideany(PLAYER, enemies):
-        PLAYER.kill()
-        lose = True
+        if c < 5:
+            c += 1
+        else:
+            PLAYER.hp -= 1
+            c = 0
+        if PLAYER.hp == 0:
+            PLAYER.kill()
+            lose = True
 
-    for f in fruits:
-        if pygame.sprite.spritecollideany(PLAYER, f):
-            f.kill()
-            points += 1;
+    if pygame.sprite.spritecollideany(PLAYER, fruits):
+        for k in fruits:
+            if pygame.sprite.collide_rect(PLAYER, k):
+                if not lose:
+                    points += 1
+                    k.kill()
 
     if lose:
-        write_in_screen(f"Você perdeu! Pontuação: {points}", (WIDTH/2, HEIGHT/2))
-        write_in_screen(f"Pressione [ESC] para sair", WIDTH/2 - 5, HEIGHT/2) 
+        write_in_screen(f"Você perdeu! Pontuação: {points}", WIDTH/2 - 200, HEIGHT/2 - 25)
+        write_in_screen(f"Pressione [ESC] para sair", WIDTH/2 - 200, HEIGHT/2) 
 
     enemies.update()
     fruits.update()
