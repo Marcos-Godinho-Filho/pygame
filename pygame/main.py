@@ -1,8 +1,9 @@
 import sys
 import pygame
-from enemy import Enemy
-from fruit import Fruit
-from player import Player
+from random import randint
+from entities.enemy import Enemy
+from entities.fruit import Fruit
+from entities.player import Player
 from pygame.locals import *
 
 pygame.init()
@@ -11,7 +12,7 @@ FPS = 60
 framesPerSec = pygame.time.Clock()
 
 pygame.font.init()                           
-FONT = pygame.font.SysFont("Monospace", 28, True, True)             
+FONT = pygame.font.SysFont("Monospace", 28, True, False)             
 
 BLACK = (0, 0, 0)
 BLUE = (30, 30, 250)
@@ -45,6 +46,8 @@ difficulty = 1
 UPDATEDIFICULTY = pygame.USEREVENT + 4
 pygame.time.set_timer(UPDATEDIFICULTY, 15000)
 
+DISABLESHIELD = pygame.USEREVENT + 5
+
 #sprites
 
 PLAYER = Player(WIDTH, HEIGHT)
@@ -68,7 +71,12 @@ def add_enemy():
 
 
 def add_fruit():
-    new_fruit = Fruit(WIDTH, HEIGHT)
+    x = randint(0, 3)
+    new_fruit = 0
+    if x == 0:
+        new_fruit = Fruit(WIDTH, HEIGHT, "shield")
+    else:
+        new_fruit = Fruit(WIDTH, HEIGHT, "point")
     fruits.add(new_fruit)
     all_sprites.add(new_fruit)
 
@@ -76,6 +84,13 @@ def add_fruit():
 def write_in_screen(text, width, height, color = WHITE):
     txt = FONT.render(text, False, color) 
     DISPLAYSURF.blit(txt, (width, height))
+
+
+shield = False
+def change_shield():
+    global shield
+    shield = False
+
 
 #main
 
@@ -102,8 +117,10 @@ while running:
                 counter += 1
 
         elif event.type == UPDATEDIFICULTY:
-            if not lose:
-                difficulty += 1
+            difficulty += 1
+
+        elif event.type == DISABLESHIELD:
+            shield = False
 
     DISPLAYSURF.blit(img, (0,0))
 
@@ -119,7 +136,8 @@ while running:
         if c < 5:
             c += 1
         else:
-            PLAYER.hp -= 1
+            if not shield:
+                PLAYER.hp -= 1
             c = 0
         if PLAYER.hp == 0:
             PLAYER.kill()
@@ -129,8 +147,16 @@ while running:
         for k in fruits:
             if pygame.sprite.collide_rect(PLAYER, k):
                 if not lose:
-                    points += 1
+                    if k.type == "point":
+                        points += 3
+                    elif k.type == "shield":
+                        points += 1
+                        shield = True
+                        pygame.time.set_timer(DISABLESHIELD, 1500)
                     k.kill()
+
+    if shield:
+        write_in_screen(f"Escudo ativo!", WIDTH/2 - 100, 20)
 
     if lose:
         write_in_screen(f"Você perdeu! Pontuação: {points}", WIDTH/2 - 200, HEIGHT/2 - 25)

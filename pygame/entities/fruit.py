@@ -5,9 +5,15 @@ from pygame.locals import *
 DEFAULT_IMG_SIZE = (50, 50)
 
 class Fruit(pygame.sprite.Sprite):
-    def __init__(self, width, height):
+    def __init__(self, width, height, type):
         super().__init__()
-        self.img = pygame.image.load("images/fruit.png").convert_alpha()
+        self.type = type
+        src = ""
+        if type == "point":
+            src = "images/strawberry.png"
+        elif type == "shield":
+            src = "images/blueberry.png"
+        self.img = pygame.image.load(src).convert_alpha()
         self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
         self.rect = self.img.get_rect()
         self.WIDTH = width
