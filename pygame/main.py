@@ -1,6 +1,6 @@
 import sys
 import pygame
-import numpy
+import struct
 from random import randint
 from entities.enemy import Enemy
 from entities.fruit import Fruit
@@ -10,7 +10,10 @@ from pygame.locals import *
 pygame.init()
 
 FILE = open("record.dat", mode="wb+")
-record = numpy.fromfile(FILE, dtype=numpy.uint32)
+record = 0
+if len(FILE.readlines()) != 0:
+    FILE.seek(0)
+    record = int.from_bytes(FILE.read(), "big")
 
 FPS = 60
 framesPerSec = pygame.time.Clock()
@@ -107,6 +110,10 @@ def restart():
     global PLAYER
     global c
     global lose
+    global record
+
+    if points > record:
+        record = points
 
     points = 0
     counter = 0
@@ -194,12 +201,10 @@ while running:
 
     if lose:
         if points > record:
-            write_in_screen(f"Parabéns, você conseguiu um novo recorde de {points} pontos!", WIDTH/2 - 200, HEIGHT/2 - 25, BLUE)
-            FILE.seek(0)
-            FILE.write(points)
+            write_in_screen(f"Novo recorde! Pontuação: {points}!", WIDTH/2 - 250, HEIGHT/2 - 25)
         else:
-            write_in_screen(f"Fim de jogo! Pontuação: {points}", WIDTH/2 - 200, HEIGHT/2 - 25)
-        write_in_screen(f"Pressione [Espaço] para reiniciar", WIDTH/2 - 200, HEIGHT/2) 
+            write_in_screen(f"Fim de jogo! Pontuação: {points}", WIDTH/2 - 250, HEIGHT/2 - 25)
+        write_in_screen(f"Pressione [Espaço] para reiniciar", WIDTH/2 - 250, HEIGHT/2) 
 
     enemies.update()
     fruits.update()
@@ -208,6 +213,12 @@ while running:
     pygame.display.update()
     framesPerSec.tick(FPS)
 
+
+if points > record:
+    record = points
+FILE.seek(0)
+a = bytearray([record])
+FILE.write(a)
 FILE.close()
-pygame.exit()
-sys.quit()
+pygame.quit()
+sys.exit()
