@@ -2,15 +2,13 @@ import random
 import pygame
 from pygame.locals import *
 
-DEFAULT_IMG_SIZE = (50, 50)
-
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, width, height):
         super().__init__()
 
-        array = ["images/bowser.png", "images/super.png", "images/turtle.png"]
-        self.img = pygame.image.load(array[random.randint(0, 2)]).convert_alpha()
-        self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
+        array = ["images/bowser.png", "images/super.png", "images/turtle.png", "images/magikoopa.png", "images/koopa_troopa.png"]
+        self.img = pygame.image.load(array[random.randint(0, 4)]).convert_alpha()
+        self.img = pygame.transform.scale(self.img, (50, 50 * self.img.get_height() / self.img.get_width()))
         
         self.rect = self.img.get_rect()
         self.WIDTH = width

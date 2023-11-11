@@ -1,5 +1,6 @@
 import sys
 import pygame
+import numpy
 from random import randint
 from entities.enemy import Enemy
 from entities.fruit import Fruit
@@ -7,6 +8,9 @@ from entities.player import Player
 from pygame.locals import *
 
 pygame.init()
+
+FILE = open("record.dat", mode="wb+")
+record = numpy.fromfile(FILE, dtype=numpy.uint32)
 
 FPS = 60
 framesPerSec = pygame.time.Clock()
@@ -92,15 +96,45 @@ def change_shield():
     shield = False
 
 
+lose = False
+def restart():
+    global points
+    global counter
+    global difficulty
+    global enemies
+    global fruits
+    global all_sprites
+    global PLAYER
+    global c
+    global lose
+
+    points = 0
+    counter = 0
+    difficulty = 1
+    change_shield()
+
+    PLAYER = Player(WIDTH, HEIGHT)
+
+    enemies = pygame.sprite.Group()
+    fruits = pygame.sprite.Group()
+    all_sprites = pygame.sprite.Group()
+    all_sprites.add(PLAYER)
+
+    c = 0
+    lose = False
+
+
 #main
 
 running = True
-lose = False
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
+            if event.key == pygame.K_SPACE:
+                restart()
 
         elif event.type == pygame.QUIT:
             running = False
@@ -159,8 +193,13 @@ while running:
         write_in_screen(f"Escudo ativo!", WIDTH/2 - 100, 20)
 
     if lose:
-        write_in_screen(f"Você perdeu! Pontuação: {points}", WIDTH/2 - 200, HEIGHT/2 - 25)
-        write_in_screen(f"Pressione [ESC] para sair", WIDTH/2 - 200, HEIGHT/2) 
+        if points > record:
+            write_in_screen(f"Parabéns, você conseguiu um novo recorde de {points} pontos!", WIDTH/2 - 200, HEIGHT/2 - 25, BLUE)
+            FILE.seek(0)
+            FILE.write(points)
+        else:
+            write_in_screen(f"Fim de jogo! Pontuação: {points}", WIDTH/2 - 200, HEIGHT/2 - 25)
+        write_in_screen(f"Pressione [Espaço] para reiniciar", WIDTH/2 - 200, HEIGHT/2) 
 
     enemies.update()
     fruits.update()
@@ -169,5 +208,6 @@ while running:
     pygame.display.update()
     framesPerSec.tick(FPS)
 
+FILE.close()
 pygame.exit()
 sys.quit()
