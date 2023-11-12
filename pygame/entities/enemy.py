@@ -3,7 +3,7 @@ import pygame
 from pygame.locals import *
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, width, height):
+    def __init__(self, width, height, difficulty):
         super().__init__()
 
         array = ["images/bowser.png", "images/super.png", "images/turtle.png", "images/magikoopa.png", "images/koopa_troopa.png"]
@@ -25,11 +25,13 @@ class Enemy(pygame.sprite.Sprite):
                 random.randint(0, self.WIDTH),
                 self.img.get_height() + (self.way - 2) * (self.HEIGHT - 2 * self.img.get_height())
             )
+
+        self.difficulty = difficulty
     
         if self.way == 0 or self.way == 2:
-            self.speed = random.randint(3, 7)
+            self.speed = random.randint(1, 3) * (1 + self.difficulty / 2)
         elif self.way == 1 or self.way == 3:
-            self.speed = random.randint(-7, -3)
+            self.speed = random.randint(-3, -1) * (1 + self.difficulty / 2)
 
 
     def update(self):

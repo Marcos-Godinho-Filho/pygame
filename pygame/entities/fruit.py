@@ -9,7 +9,7 @@ class Fruit(pygame.sprite.Sprite):
         super().__init__()
         self.type = type
         src = ""
-        if type == "point":
+        if type == "hp":
             src = "images/strawberry.png"
         elif type == "shield":
             src = "images/blueberry.png"

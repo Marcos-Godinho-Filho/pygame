@@ -72,7 +72,7 @@ img = pygame.transform.scale(img, (WIDTH, HEIGHT))
 #useful functions
 
 def add_enemy():
-    new_enemy = Enemy(WIDTH, HEIGHT)
+    new_enemy = Enemy(WIDTH, HEIGHT, difficulty)
     enemies.add(new_enemy)
     all_sprites.add(new_enemy)
 
@@ -83,7 +83,7 @@ def add_fruit():
     if x == 0:
         new_fruit = Fruit(WIDTH, HEIGHT, "shield")
     else:
-        new_fruit = Fruit(WIDTH, HEIGHT, "point")
+        new_fruit = Fruit(WIDTH, HEIGHT, "hp")
     fruits.add(new_fruit)
     all_sprites.add(new_fruit)
 
@@ -147,7 +147,7 @@ while running:
             running = False
 
         elif event.type == ADDENEMY:
-            for i in range(0, difficulty):
+            for i in range(0, int(1 + difficulty / 2)):
                 add_enemy()
 
         elif event.type == ADDFRUIT:
@@ -188,10 +188,11 @@ while running:
         for k in fruits:
             if pygame.sprite.collide_rect(PLAYER, k):
                 if not lose:
-                    if k.type == "point":
-                        points += 3
-                    elif k.type == "shield":
+                    if k.type == "hp":
                         points += 1
+                        PLAYER.hp += 1
+                    elif k.type == "shield":
+                        points += 3
                         shield = True
                         pygame.time.set_timer(DISABLESHIELD, 1500)
                     k.kill()
