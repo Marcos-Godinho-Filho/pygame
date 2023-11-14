@@ -4,29 +4,29 @@ from pygame.locals import *
 DEFAULT_IMG_SIZE = (75, 75)
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int):
         super().__init__()
-        self.img = pygame.image.load("images/mario.png").convert_alpha()
+        self.img: pygame.Surface = pygame.image.load("images/mario.png").convert_alpha()
         self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
-        self.rect = self.img.get_rect()
-        self.WIDTH = width
-        self.HEIGHT = height
+        self.rect: pygame.Rect = self.img.get_rect()
+        self.WIDTH: int = width
+        self.HEIGHT: int = height
         self.rect.center = (
             (self.WIDTH - self.img.get_width())/2,
             (self.HEIGHT - self.img.get_height())/2
         )
-        self.hp = 10
+        self.hp: int = 10
 
 
     def update(self):
         pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[K_UP]:
+        if pressed_keys[K_UP] or pressed_keys[K_w]:
             self.rect.move_ip(0, -7)
-        if pressed_keys[K_DOWN]:
-            self.rect.move_ip(0, 7)
-        if pressed_keys[K_LEFT]:
+        if pressed_keys[K_DOWN] or pressed_keys[K_s]:
+            self.rect.move_ip(0, 7) 
+        if pressed_keys[K_LEFT] or pressed_keys[K_a]:
             self.rect.move_ip(-7, 0)
-        if pressed_keys[K_RIGHT]:
+        if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
             self.rect.move_ip(7, 0)
 
         if self.rect.left < 0:
@@ -39,11 +39,11 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = self.HEIGHT
 
     
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface):
         surface.blit(self.img, self.rect)
 
     
-    def set_img(self, img, width, height):
+    def set_img(self, img: pygame.Surface, width: int, height: int):
         self.img = pygame.image.load(img).convert_alpha()
         self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
         self.rect = self.img.get_rect()

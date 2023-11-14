@@ -125,13 +125,19 @@ class Game():
                 if pygame.sprite.collide_rect(self.PLAYER, k):
                     if not self.lose:
                         if k.type == "hp":
-                            self.PLAYER.hp += 1
+                            self.PLAYER.hp += randint(1, 3)
                         elif k.type == "shield":
                             self.shield = True
                             self.add_timer("DISABLESHIELD", 1500)
                         elif k.type == "attack":
-                            self.attack = True
-                            self.add_timer("DISABLEATTACK", 1500)
+                            rand = randint(0, 3)
+                            if rand != 0:
+                                self.attack = True
+                                self.add_timer("DISABLEATTACK", 1500)
+                            else:
+                                for j in self.enemies:
+                                    self.points += 1
+                                    j.kill()
                         k.kill()
                         self.points += 3
 
