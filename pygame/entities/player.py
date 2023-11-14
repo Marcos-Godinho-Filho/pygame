@@ -41,3 +41,13 @@ class Player(pygame.sprite.Sprite):
     
     def draw(self, surface):
         surface.blit(self.img, self.rect)
+
+    
+    def set_img(self, img, width, height):
+        self.img = pygame.image.load(img).convert_alpha()
+        self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
+        self.rect = self.img.get_rect()
+        self.rect.center = (
+            (self.WIDTH - width)/2,
+            (self.HEIGHT - height)/2
+        )
