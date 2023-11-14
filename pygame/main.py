@@ -55,6 +55,8 @@ pygame.time.set_timer(UPDATEDIFICULTY, 15000)
 
 DISABLESHIELD = pygame.USEREVENT + 5
 
+DISABLEATTACK = pygame.USEREVENT + 6
+
 #sprites
 
 PLAYER = Player(WIDTH, HEIGHT)
@@ -82,6 +84,8 @@ def add_fruit():
     new_fruit = 0
     if x == 0:
         new_fruit = Fruit(WIDTH, HEIGHT, "shield")
+    elif x == 1:
+        new_fruit = Fruit(WIDTH, HEIGHT, "attack")
     else:
         new_fruit = Fruit(WIDTH, HEIGHT, "hp")
     fruits.add(new_fruit)
@@ -94,11 +98,7 @@ def write_in_screen(text, width, height, color = WHITE):
 
 
 shield = False
-def change_shield():
-    global shield
-    shield = False
-
-
+attack = False
 lose = False
 def restart():
     global points
@@ -111,6 +111,8 @@ def restart():
     global c
     global lose
     global record
+    global attack
+    global shield
 
     if points > record:
         record = points
@@ -118,7 +120,8 @@ def restart():
     points = 0
     counter = 0
     difficulty = 1
-    change_shield()
+    shield = False
+    attack = False
 
     PLAYER = Player(WIDTH, HEIGHT)
 
@@ -163,6 +166,9 @@ while running:
         elif event.type == DISABLESHIELD:
             shield = False
 
+        elif event.type == DISABLEATTACK:
+            attack = False
+
     DISPLAYSURF.blit(img, (0,0))
 
     if not lose:
@@ -178,7 +184,12 @@ while running:
             c += 1
         else:
             if not shield:
-                PLAYER.hp -= 1
+                if not attack:
+                    PLAYER.hp -= 1
+                else:
+                    for k in enemies:
+                        if pygame.sprite.collide_rect(PLAYER, k):
+                            k.kill()
             c = 0
         if PLAYER.hp == 0:
             PLAYER.kill()
@@ -189,16 +200,21 @@ while running:
             if pygame.sprite.collide_rect(PLAYER, k):
                 if not lose:
                     if k.type == "hp":
-                        points += 1
                         PLAYER.hp += 1
                     elif k.type == "shield":
-                        points += 3
                         shield = True
                         pygame.time.set_timer(DISABLESHIELD, 1500)
+                    elif k.type == "attack":
+                        attack = True
+                        pygame.time.set_timer(DISABLEATTACK, 1500)
                     k.kill()
+                    points += 3
 
     if shield:
         write_in_screen(f"Escudo ativo!", WIDTH/2 - 100, 20)
+
+    if attack:
+        write_in_screen(f"Ataque ativo!", WIDTH/2 - 100, 20)
 
     if lose:
         if points > record:

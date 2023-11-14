@@ -13,6 +13,8 @@ class Fruit(pygame.sprite.Sprite):
             src = "images/strawberry.png"
         elif type == "shield":
             src = "images/blueberry.png"
+        elif type == "attack":
+            src = "images/banana.png"
         self.img = pygame.image.load(src).convert_alpha()
         self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
         self.rect = self.img.get_rect()
