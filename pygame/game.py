@@ -1,4 +1,5 @@
 import pygame
+import pickle
 from pygame.locals import *
 from random import randint
 from entities.player import Player
@@ -18,11 +19,14 @@ class Game():
         self.counter: int = 0
         self.difficulty: int = 1
         self.collide_time: int = 0
-        self.FILE = open("record.dat", mode="wb+")
+        self.URL: str = "record.dat"
+        self.file = open(self.URL, mode="rb")
         self.record: int = 0
-        if len(self.FILE.readlines()) != 0:
-            self.FILE.seek(0)
-            self.record = int.from_bytes(self.FILE.read(), "big") 
+        try:
+            self.record = pickle.load(self.file)
+        except:
+            self.record = 0
+        self.file.close()
         self.lose: bool = False
         self.attack: bool = False
         self.shield: bool = False
@@ -143,9 +147,7 @@ class Game():
 
 
     def save_record(self):
+        self.file = open(self.URL, "wb")
         if self.points > self.record:
-            self.record = self.points
-            self.FILE.seek(0)
-            a = bytearray([self.record])
-            self.FILE.write(a)
-            self.FILE.close()
+            pickle.dump(self.points, self.file)
+        self.file.close()

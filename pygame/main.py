@@ -79,6 +79,7 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
             if event.key == pygame.K_SPACE:
+                game.save_record()
                 game = Game(WIDTH, HEIGHT)
 
     game.handle_events(events)
