@@ -45,9 +45,6 @@ def update_screen():
     for entity in game.all_sprites:
         entity.draw(DISPLAYSURF)
 
-    if game.shield:
-        write_in_screen(f"SHIELD ON!", game.WIDTH/2 - 50, 50, color=BLUE, font=LARGE_FONT)
-
     if game.attack:
         write_in_screen(f"ATTACK!", game.WIDTH/2 - 50, 50, color=BLUE, font=LARGE_FONT)
 
@@ -58,9 +55,7 @@ def update_screen():
             write_in_screen(f"GAME OVER! Score: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 50, font=LARGE_FONT)
         write_in_screen(f"Press [Space] to restart", game.WIDTH/2 - 200, game.HEIGHT/2) 
 
-    game.enemies.update()
-    game.fruits.update()
-    game.PLAYER.update()
+    game.all_sprites.update()
 
 
 #main

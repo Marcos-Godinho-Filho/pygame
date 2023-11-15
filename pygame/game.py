@@ -5,6 +5,7 @@ from random import randint
 from entities.player import Player
 from entities.enemy import Enemy
 from entities.fruit import Fruit
+from entities.explosion import Explosion
 
 class Game():
     def __init__(self, width: int, height: int):
@@ -29,7 +30,6 @@ class Game():
         self.file.close()
         self.lose: bool = False
         self.attack: bool = False
-        self.shield: bool = False
         self.events: dict = {}
         self.event_counter: int = pygame.USEREVENT + 1
         self.add_events()
@@ -47,8 +47,6 @@ class Game():
 
         self.add_event("UPDATEDIFFICULTY")
         self.add_timer("UPDATEDIFFICULTY", 15000)
-
-        self.add_event("DISABLESHIELD")
 
         self.add_event("DISABLEATTACK")
 
@@ -71,10 +69,10 @@ class Game():
 
 
     def add_fruit(self):
-        x = randint(0, 3)
+        x = randint(0, 2)
         new_fruit = 0
         if x == 0:
-            new_fruit = Fruit(self.WIDTH, self.HEIGHT, "shield")
+            new_fruit = Fruit(self.WIDTH, self.HEIGHT, "explosion")
         elif x == 1:
             new_fruit = Fruit(self.WIDTH, self.HEIGHT, "attack")
         else:
@@ -83,10 +81,15 @@ class Game():
         self.all_sprites.add(new_fruit)
 
     
+    def add_explosion(self, coord):
+        new_explosion = Explosion(coord[0], coord[1])
+        self.all_sprites.add(new_explosion)
+
+    
     def handle_events(self, events):
         for event in events:
             if event.type == self.events["ADDENEMY"]:
-                for i in range(0, int(1 + self.difficulty / 2)):
+                for i in range(0, int(1 + self.difficulty / 8)):
                     self.add_enemy()
 
             elif event.type == self.events["ADDFRUIT"]:
@@ -99,9 +102,6 @@ class Game():
             elif event.type == self.events["UPDATEDIFFICULTY"]:
                 self.difficulty += 1
 
-            elif event.type == self.events["DISABLESHIELD"]:
-                self.shield = False
-
             elif event.type == self.events["DISABLEATTACK"]:
                 self.attack = False
 
@@ -111,14 +111,14 @@ class Game():
             if self.collide_time < 5:
                 self.collide_time += 1
             else:
-                if not self.shield:
-                    if not self.attack:
-                        self.PLAYER.hp -= 1
-                    else:
-                        for k in self.enemies:
-                            if pygame.sprite.collide_rect(self.PLAYER, k):
-                                self.points += 5
-                                k.kill()
+                if not self.attack:
+                    self.PLAYER.hp -= 1
+                else:
+                    for k in self.enemies:
+                        if pygame.sprite.collide_rect(self.PLAYER, k):
+                            self.points += 5
+                            self.add_explosion(k.rect.center)
+                            k.kill()
                 self.collide_time = 0
             if self.PLAYER.hp == 0:
                 self.PLAYER.kill()
@@ -130,18 +130,14 @@ class Game():
                     if not self.lose:
                         if k.type == "hp":
                             self.PLAYER.hp += randint(1, 3)
-                        elif k.type == "shield":
-                            self.shield = True
-                            self.add_timer("DISABLESHIELD", 1500)
+                        elif k.type == "explosion":
+                            for j in self.enemies:
+                                self.points += 1
+                                self.add_explosion(j.rect.center)
+                                j.kill()
                         elif k.type == "attack":
-                            rand = randint(0, 3)
-                            if rand != 0:
-                                self.attack = True
-                                self.add_timer("DISABLEATTACK", 1500)
-                            else:
-                                for j in self.enemies:
-                                    self.points += 1
-                                    j.kill()
+                            self.attack = True
+                            self.add_timer("DISABLEATTACK", 1500)
                         k.kill()
                         self.points += 3
 

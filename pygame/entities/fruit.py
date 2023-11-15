@@ -11,7 +11,7 @@ class Fruit(pygame.sprite.Sprite):
         src = ""
         if type == "hp":
             src = "images/strawberry.png"
-        elif type == "shield":
+        elif type == "explosion":
             src = "images/blueberry.png"
         elif type == "attack":
             src = "images/banana.png"
