@@ -27,18 +27,22 @@ class Enemy(pygame.sprite.Sprite):
             )
 
         self.difficulty: int = difficulty
+        self.acceleration: int = 0.01
+        self.time: int = 1
     
         if self.way == 0 or self.way == 2:
-            self.speed = random.randint(1, 3) * (1 + self.difficulty / 4)
+            self.speed = random.randint(1, 3) * (1 + self.difficulty / 2)
         elif self.way == 1 or self.way == 3:
-            self.speed = random.randint(-3, -1) * (1 + self.difficulty / 4)
+            self.speed = random.randint(-3, -1) * (1 + self.difficulty / 2) 
+            self.acceleration = -self.acceleration
 
 
     def update(self):
+        self.time += 1
         if (self.way == 0 or self.way == 1):
-            self.rect.move_ip(self.speed, 0)
+            self.rect.move_ip(self.speed + self.acceleration * self.time, 0)
         else:
-            self.rect.move_ip(0, self.speed)
+            self.rect.move_ip(0, self.speed + self.acceleration * self.time)
 
         if self.rect.left < 0 or self.rect.right > self.WIDTH:
             self.kill()

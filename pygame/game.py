@@ -46,7 +46,7 @@ class Game():
         self.add_timer("UPDATECOUNTER", 1000)
 
         self.add_event("UPDATEDIFFICULTY")
-        self.add_timer("UPDATEDIFFICULTY", 15000)
+        self.add_timer("UPDATEDIFFICULTY", 10000)
 
         self.add_event("DISABLEATTACK")
 
@@ -69,11 +69,11 @@ class Game():
 
 
     def add_fruit(self):
-        x = randint(0, 2)
+        x = randint(0, 4)
         new_fruit = 0
         if x == 0:
             new_fruit = Fruit(self.WIDTH, self.HEIGHT, "explosion")
-        elif x == 1:
+        elif x == 1 or x == 2:
             new_fruit = Fruit(self.WIDTH, self.HEIGHT, "attack")
         else:
             new_fruit = Fruit(self.WIDTH, self.HEIGHT, "hp")
@@ -89,7 +89,7 @@ class Game():
     def handle_events(self, events):
         for event in events:
             if event.type == self.events["ADDENEMY"]:
-                for i in range(0, int(1 + self.difficulty / 8)):
+                for i in range(0, int(1 + self.difficulty / 3)):
                     self.add_enemy()
 
             elif event.type == self.events["ADDFRUIT"]:
@@ -108,7 +108,7 @@ class Game():
 
     def handle_collisions(self):
         if pygame.sprite.spritecollideany(self.PLAYER, self.enemies):
-            if self.collide_time < 5:
+            if self.collide_time < 10:
                 self.collide_time += 1
             else:
                 if not self.attack:
