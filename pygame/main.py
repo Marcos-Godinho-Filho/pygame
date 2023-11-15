@@ -9,11 +9,13 @@ FPS = 60
 framesPerSec = pygame.time.Clock()
 
 pygame.font.init()                        
-FONT = pygame.font.SysFont("Monospace", 28, True, False)             
+SMALL_FONT = pygame.font.Font("fonts/SuperMario256.ttf", 28)
+LARGE_FONT = pygame.font.Font("fonts/SuperMario256.ttf", 36)             
 
-BLUE = (100, 100, 250)
+BLUE = (0, 125, 200)
 RED = (250, 30, 30)
-WHITE = (230, 240, 250)
+YELLOW = (240, 210, 5)
+WHITE = (250, 250, 250)
 
 WIDTH = 1000
 HEIGHT = 600
@@ -27,8 +29,8 @@ img = pygame.transform.scale(img, (WIDTH, HEIGHT))
 
 
 #useful functions
-def write_in_screen(text, width, height, color = WHITE):
-    txt = FONT.render(text, False, color) 
+def write_in_screen(text: str, width: float, height: float, color: tuple = WHITE, font: pygame.font.Font = SMALL_FONT):
+    txt = font.render(text, False, color) 
     DISPLAYSURF.blit(txt, (width, height))
 
 
@@ -36,25 +38,25 @@ def update_screen():
     DISPLAYSURF.blit(img, (0,0))
 
     if not game.lose:
-        write_in_screen(f"Tempo: {game.counter}s", 50, 50)
-        write_in_screen(f"Pontuação: {game.points}", 50, 75, BLUE)
-        write_in_screen(f"Vida: {game.PLAYER.hp}", 50, 100, RED)
+        write_in_screen(f"Time: {game.counter}s", 50, 50)
+        write_in_screen(f"SCORE: {game.points}", 50, 100, YELLOW)
+        write_in_screen(f"LIFE: {game.PLAYER.hp}", 50, 150, RED) 
 
     for entity in game.all_sprites:
         entity.draw(DISPLAYSURF)
 
     if game.shield:
-        write_in_screen(f"Escudo ativo!", game.WIDTH/2 - 100, 20)
+        write_in_screen(f"SHIELD ON!", game.WIDTH/2 - 50, 50, color=BLUE, font=LARGE_FONT)
 
     if game.attack:
-        write_in_screen(f"Ataque ativo!", game.WIDTH/2 - 100, 20)
+        write_in_screen(f"ATTACK!", game.WIDTH/2 - 50, 50, color=BLUE, font=LARGE_FONT)
 
     if game.lose:
         if game.points > game.record:
-            write_in_screen(f"Novo recorde! Pontuação: {game.points}!", game.WIDTH/2 - 250, game.HEIGHT/2 - 25)
+            write_in_screen(f"NEW RECORD! Score: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 50, color=YELLOW, font=LARGE_FONT)
         else:
-            write_in_screen(f"Fim de jogo! Pontuação: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 25)
-        write_in_screen(f"Pressione [Espaço] para reiniciar", game.WIDTH/2 - 250, game.HEIGHT/2) 
+            write_in_screen(f"GAME OVER! Score: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 50, font=LARGE_FONT)
+        write_in_screen(f"Press [Space] to restart", game.WIDTH/2 - 200, game.HEIGHT/2) 
 
     game.enemies.update()
     game.fruits.update()
