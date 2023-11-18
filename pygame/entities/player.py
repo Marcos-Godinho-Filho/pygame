@@ -16,18 +16,25 @@ class Player(pygame.sprite.Sprite):
             (self.HEIGHT - self.img.get_height())/2
         )
         self.hp: int = 10
+        self.munition: int = 10
+        self.way = 0
 
 
     def update(self):
+        speed: int = 7
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_UP] or pressed_keys[K_w]:
-            self.rect.move_ip(0, -7)
+            self.way = 0
+            self.rect.move_ip(0, -speed)
         if pressed_keys[K_DOWN] or pressed_keys[K_s]:
-            self.rect.move_ip(0, 7) 
+            self.way = 2
+            self.rect.move_ip(0, speed) 
         if pressed_keys[K_LEFT] or pressed_keys[K_a]:
-            self.rect.move_ip(-7, 0)
+            self.way = 3
+            self.rect.move_ip(-speed, 0)
         if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
-            self.rect.move_ip(7, 0)
+            self.way = 1
+            self.rect.move_ip(speed, 0)
 
         if self.rect.left < 0:
             self.rect.left = 0

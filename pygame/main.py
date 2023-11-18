@@ -34,29 +34,49 @@ def write_in_screen(text: str, width: float, height: float, color: tuple = WHITE
     DISPLAYSURF.blit(txt, (width, height))
 
 
+counter_shield = 0
+
 def update_screen():
     DISPLAYSURF.blit(img, (0,0))
 
     if not game.lose:
-        write_in_screen(f"Time: {game.counter}s", 50, 50)
-        write_in_screen(f"SCORE: {game.points}", 50, 100, YELLOW)
-        write_in_screen(f"LIFE: {game.PLAYER.hp}", 50, 150, RED) 
+        write_in_screen(f"Time: {game.counter}s", WIDTH - 200, 50)
+        write_in_screen(f"SCORE: {game.points}", WIDTH - 200, 100)
+        write_in_screen(f"DIFFICULTY: {game.difficulty}", WIDTH - 250, HEIGHT - 50)
+        write_in_screen(f"LIFE: ", 50, 50, RED) 
+        write_in_screen(f"FIRE: ", 50, 100, YELLOW) 
 
+        rect = pygame.Rect(130, 50, game.PLAYER.hp * 20, 20)
+        pygame.draw.rect(DISPLAYSURF, RED, rect)
+
+        rect = pygame.Rect(130, 100, game.PLAYER.munition * 20, 20)
+        pygame.draw.rect(DISPLAYSURF, YELLOW, rect)
+       
+        game.PLAYER.update()
+        game.PLAYER.draw(DISPLAYSURF)
+        for enemy in game.enemies:
+            enemy.update_player_coord(game.PLAYER.rect.center)
+
+    game.all_sprites.update()
     for entity in game.all_sprites:
         entity.draw(DISPLAYSURF)
 
-    if game.attack:
-        write_in_screen(f"ATTACK!", game.WIDTH/2 - 50, 50, color=BLUE, font=LARGE_FONT)
+    if game.shield:
+        global counter_shield
+        if counter_shield >= 0:
+            counter_shield += 0.02
+        if counter_shield == 3:
+            counter_shield = 0
+        write_in_screen(f"SHIELD ACTIVE!", game.WIDTH/2 - 100, 50, color=BLUE, font=LARGE_FONT)
+        rect = pygame.Rect(game.WIDTH/2 - 100, 100, (3 - counter_shield) * 100, 20)
+        pygame.draw.rect(DISPLAYSURF, BLUE, rect)
 
     if game.lose:
         if game.points > game.record:
             write_in_screen(f"NEW RECORD! Score: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 50, color=YELLOW, font=LARGE_FONT)
         else:
             write_in_screen(f"GAME OVER! Score: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 50, font=LARGE_FONT)
-        write_in_screen(f"Press [Space] to restart", game.WIDTH/2 - 200, game.HEIGHT/2) 
-
-    game.all_sprites.update()
-
+        write_in_screen(f"Press [Enter] to restart", game.WIDTH/2 - 200, game.HEIGHT/2) 
 
 #main
 programIcon = pygame.image.load("images/mario.png").convert_alpha()
@@ -75,13 +95,14 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-            if event.key == pygame.K_SPACE:
-                game.save_record()
-                game = Game(WIDTH, HEIGHT)
+            if event.key == pygame.K_RETURN:
+                if game.lose:
+                    game.save_record()
+                    game = Game(WIDTH, HEIGHT)
 
-    game.handle_events(events)
-
-    game.handle_collisions()
+    if not game.lose:
+        game.handle_events(events)
+        game.handle_collisions()
 
     update_screen()
 
