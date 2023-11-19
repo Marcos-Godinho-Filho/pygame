@@ -6,34 +6,57 @@ DEFAULT_IMG_SIZE = (75, 75)
 class Player(pygame.sprite.Sprite):
     def __init__(self, width: int, height: int):
         super().__init__()
-        self.img: pygame.Surface = pygame.image.load("images/mario.png").convert_alpha()
-        self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
-        self.rect: pygame.Rect = self.img.get_rect()
+
+        array = ["down_1", "down_2", "horizontal_1", "horizontal_2", "stopped", "up_1", "up_2"]
+        self.imgs: list = []
+        for k in array:
+            img = pygame.image.load(f"images/mario/{k}.png").convert_alpha()
+            img = pygame.transform.scale(img, DEFAULT_IMG_SIZE)
+            self.imgs.append(img)
+
         self.WIDTH: int = width
         self.HEIGHT: int = height
-        self.rect.center = (
-            (self.WIDTH - self.img.get_width())/2,
-            (self.HEIGHT - self.img.get_height())/2
-        )
-        self.hp: int = 10
-        self.munition: int = 10
+
+        self.img: pygame.Surface
+        self.rect: pygame.Rect = pygame.Rect(self.WIDTH/2, self.HEIGHT/2, DEFAULT_IMG_SIZE[0], DEFAULT_IMG_SIZE[1])
+        self.set_img(self.imgs[4])
+
+        self.MAX_MUNITION = 10
+        self.MAX_HP = 10
+
+        self.hp: int = self.MAX_HP
+        self.munition: int = self.MAX_MUNITION
         self.way = 0
+
+        self.c = 0
 
 
     def update(self):
         speed: int = 7
         pressed_keys = pygame.key.get_pressed()
+
+        self.c += 1
+        if self.c == 5:
+            self.c = 0
+
         if pressed_keys[K_UP] or pressed_keys[K_w]:
             self.way = 0
+            self.set_img(self.imgs[5])
             self.rect.move_ip(0, -speed)
-        if pressed_keys[K_DOWN] or pressed_keys[K_s]:
+
+        elif pressed_keys[K_DOWN] or pressed_keys[K_s]:
             self.way = 2
+            self.set_img(self.imgs[0])
             self.rect.move_ip(0, speed) 
-        if pressed_keys[K_LEFT] or pressed_keys[K_a]:
+
+        elif pressed_keys[K_LEFT] or pressed_keys[K_a]:
             self.way = 3
+            self.set_img(self.imgs[2], flip=True)
             self.rect.move_ip(-speed, 0)
-        if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
+
+        elif pressed_keys[K_RIGHT] or pressed_keys[K_d]:
             self.way = 1
+            self.set_img(self.imgs[2])
             self.rect.move_ip(speed, 0)
 
         if self.rect.left < 0:
@@ -50,11 +73,10 @@ class Player(pygame.sprite.Sprite):
         surface.blit(self.img, self.rect)
 
     
-    def set_img(self, img: pygame.Surface, width: int, height: int):
-        self.img = pygame.image.load(img).convert_alpha()
-        self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
+    def set_img(self, img: pygame.Surface, flip=False):
+        center = self.rect.center
+        self.img = img
+        if flip:
+            self.img = pygame.transform.flip(self.img, True, False)
         self.rect = self.img.get_rect()
-        self.rect.center = (
-            (self.WIDTH - width)/2,
-            (self.HEIGHT - height)/2
-        )
+        self.rect.center = center

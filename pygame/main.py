@@ -33,9 +33,6 @@ def write_in_screen(text: str, width: float, height: float, color: tuple = WHITE
     txt = font.render(text, False, color) 
     DISPLAYSURF.blit(txt, (width, height))
 
-
-counter_shield = 0
-
 def update_screen():
     DISPLAYSURF.blit(img, (0,0))
 
@@ -62,20 +59,22 @@ def update_screen():
         entity.draw(DISPLAYSURF)
 
     if game.shield:
-        global counter_shield
-        if counter_shield >= 0:
-            counter_shield += 0.02
-        if counter_shield == 3:
-            counter_shield = 0
         write_in_screen(f"SHIELD ACTIVE!", game.WIDTH/2 - 100, 50, color=BLUE, font=LARGE_FONT)
-        rect = pygame.Rect(game.WIDTH/2 - 100, 100, (3 - counter_shield) * 100, 20)
+        rect = pygame.Rect(game.WIDTH/2 - 100, 100, (game.MAX_SHIELD - game.shield_counter) * 60, 20)
         pygame.draw.rect(DISPLAYSURF, BLUE, rect)
+
+    elif game.double:
+        write_in_screen(f"2x SCORE!", game.WIDTH/2 - 100, 50, color=YELLOW, font=LARGE_FONT)
+        rect = pygame.Rect(game.WIDTH/2 - 100, 100, (game.MAX_DOUBLE - game.double_counter) * 60, 20)
+        pygame.draw.rect(DISPLAYSURF, YELLOW, rect)
 
     if game.lose:
         if game.points > game.record:
-            write_in_screen(f"NEW RECORD! Score: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 50, color=YELLOW, font=LARGE_FONT)
+            write_in_screen(f"NEW RECORD! Score: {game.points}", game.WIDTH/2 - 225, game.HEIGHT/2 - 100, color=YELLOW, font=LARGE_FONT)
         else:
-            write_in_screen(f"GAME OVER! Score: {game.points}", game.WIDTH/2 - 250, game.HEIGHT/2 - 50, font=LARGE_FONT)
+            write_in_screen(f"GAME OVER! Score: {game.points}", game.WIDTH/2 - 225, game.HEIGHT/2 - 100, color=YELLOW, font=LARGE_FONT)
+
+        write_in_screen(f"Record: {game.record}", game.WIDTH/2 - 100, game.HEIGHT/2 - 50)
         write_in_screen(f"Press [Enter] to restart", game.WIDTH/2 - 200, game.HEIGHT/2) 
 
 #main

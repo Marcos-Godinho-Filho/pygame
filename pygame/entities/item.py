@@ -4,17 +4,21 @@ from pygame.locals import *
 
 DEFAULT_IMG_SIZE = (50, 50)
 
-class Fruit(pygame.sprite.Sprite):
+class Item(pygame.sprite.Sprite):
     def __init__(self, width: int, height: int, type: str):
         super().__init__()
         self.type: str = type
-        src = ""
+        src = "images/items/"
         if type == "hp":
-            src = "images/strawberry.png"
+            src += "strawberry.png"
         elif type == "explosion":
-            src = "images/blueberry.png"
+            src += "blueberry.png"
         elif type == "shield":
-            src = "images/banana.png"
+            src += "banana.png"
+        elif type == "double":
+            src += "star.png"
+        elif type == "points":
+            src += "coin.png"
         self.img: pygame.Surface = pygame.image.load(src).convert_alpha()
         self.img = pygame.transform.scale(self.img, DEFAULT_IMG_SIZE)
         self.rect: pygame.Rect = self.img.get_rect()

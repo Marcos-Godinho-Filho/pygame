@@ -2,8 +2,6 @@ import random
 import pygame
 from pygame.locals import *
 
-DEFAULT_SIZE = (50, 50)
-
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, width: int, height: int, img_array: list):
         super().__init__()
@@ -34,6 +32,5 @@ class Explosion(pygame.sprite.Sprite):
             self.kill()
         self.current_img -= 1
         self.img: pygame.Surface = self.img_array[self.current_img-1]
-        self.img = pygame.transform.scale(self.img, DEFAULT_SIZE)
         self.rect: pygame.Rect = self.img.get_rect()
         self.rect.center = (self.WIDTH, self.HEIGHT)

@@ -4,7 +4,7 @@ from pygame.locals import *
 from random import randint
 from entities.player import Player
 from entities.enemy import Enemy
-from entities.fruit import Fruit
+from entities.item import Item
 from entities.explosion import Explosion
 from entities.shot import Shot
 
@@ -23,6 +23,7 @@ class Game():
         self.counter: int = 0
         self.difficulty: int = 1
         self.collide_time: int = 0
+
         self.URL: str = "record.dat"
         self.file = open(self.URL, mode="rb")
         self.record: int = 0
@@ -31,15 +32,29 @@ class Game():
         except:
             self.record = 0
         self.file.close()
+
         self.lose: bool = False
         self.shield: bool = False
+        self.MAX_SHIELD: int = 5
+        self.shield_counter: int = 0
+        self.double: bool = False
+        self.MAX_DOUBLE: int = 5
+        self.double_counter: int = 0
+
         self.events: dict = {}
         self.event_counter: int = pygame.USEREVENT + 1
 
-        self.img_array = []
+        self.explosion_array = []
         for i in range(8, 0, -1):
-            img = pygame.image.load(f"images/{i}.png").convert_alpha()
-            self.img_array.append(img)
+            img = pygame.image.load(f"images/explosions/{i}.png").convert_alpha()
+            img = pygame.transform.scale(img, (50, 50))
+            self.explosion_array.append(img)
+
+        array = ["bowser.png", "super.png", "turtle.png", "magikoopa.png", "koopa_troopa.png"]
+        self.enemies_array = []
+        for k in array:
+            img = pygame.image.load("images/enemies/" + k).convert_alpha()
+            self.enemies_array.append(img)
 
         self.add_events()
 
@@ -48,8 +63,8 @@ class Game():
         self.add_event("ADDENEMY")
         self.add_timer("ADDENEMY", 1000)
 
-        self.add_event("ADDFRUIT")
-        self.add_timer("ADDFRUIT", 5000)
+        self.add_event("ADDITEM")
+        self.add_timer("ADDITEM", 5000)
 
         self.add_event("UPDATECOUNTER")
         self.add_timer("UPDATECOUNTER", 1000)
@@ -58,11 +73,14 @@ class Game():
         self.add_timer("UPDATEDIFFICULTY", 15000)
 
         self.add_event("RECHARGEMUNITION")
-        self.add_timer("RECHARGEMUNITION", 7500)
+        self.add_timer("RECHARGEMUNITION", 2000)
+
+        self.add_event("HEAL")
+        self.add_timer("HEAL", 7000)
 
         self.add_event("DISABLESHIELD")
 
-        self.add_event("DISABLEDAMAGEICON")
+        self.add_event("DISABLEDOUBLE")
 
     
     def add_event(self, eventName: str):
@@ -75,26 +93,30 @@ class Game():
 
 
     def add_enemy(self):
-        new_enemy = Enemy(self.WIDTH, self.HEIGHT, self.difficulty, self.PLAYER.rect.center)
+        new_enemy = Enemy(self.WIDTH, self.HEIGHT, self.difficulty, self.PLAYER.rect.center, self.enemies_array)
         self.enemies.add(new_enemy)
         self.all_sprites.add(new_enemy)
 
 
-    def add_fruit(self):
-        x = randint(0, 4)
-        new_fruit = 0
+    def add_item(self):
+        x = randint(0, 7)
+        new_item = 0
         if x == 0:
-            new_fruit = Fruit(self.WIDTH, self.HEIGHT, "explosion")
+            new_item = Item(self.WIDTH, self.HEIGHT, "explosion")
         elif x == 1 or x == 2:
-            new_fruit = Fruit(self.WIDTH, self.HEIGHT, "shield")
+            new_item = Item(self.WIDTH, self.HEIGHT, "shield")
+        elif x == 3 or x == 4:
+            new_item = Item(self.WIDTH, self.HEIGHT, "double")
+        elif x == 5:
+            new_item = Item(self.WIDTH, self.HEIGHT, "points")
         else:
-            new_fruit = Fruit(self.WIDTH, self.HEIGHT, "hp")
-        self.fruits.add(new_fruit)
-        self.all_sprites.add(new_fruit)
+            new_item = Item(self.WIDTH, self.HEIGHT, "hp")
+        self.fruits.add(new_item)
+        self.all_sprites.add(new_item)
 
     
     def add_explosion(self, coord):
-        new_explosion = Explosion(coord[0], coord[1], self.img_array)
+        new_explosion = Explosion(coord[0], coord[1], self.explosion_array)
         self.all_sprites.add(new_explosion)
 
 
@@ -102,6 +124,18 @@ class Game():
         new_shot = Shot((self.PLAYER.rect.center), (self.WIDTH, self.HEIGHT), self.PLAYER.way)
         self.shots.add(new_shot)
         self.all_sprites.add(new_shot)
+
+
+    def update_player_hp(self, plus: int):
+        self.PLAYER.hp += plus
+        if self.PLAYER.hp > self.PLAYER.MAX_HP:
+            self.PLAYER.hp = self.PLAYER.MAX_HP
+
+
+    def update_player_munition(self, plus: int):
+        self.PLAYER.munition += plus
+        if self.PLAYER.munition > self.PLAYER.MAX_MUNITION:
+            self.PLAYER.munition = self.PLAYER.MAX_MUNITION
 
     
     def handle_events(self, events):
@@ -116,21 +150,33 @@ class Game():
                 for i in range(0, int(1 + self.difficulty / 3)):
                     self.add_enemy()
 
-            elif event.type == self.events["ADDFRUIT"]:
-                self.add_fruit()
+            elif event.type == self.events["ADDITEM"]:
+                self.add_item()
 
             elif event.type == self.events["UPDATECOUNTER"]:
-                if not self.lose:         
+                if not self.lose:
                     self.counter += 1
+                    if self.shield:
+                        self.shield_counter += 1
+                    if self.double:
+                        self.double_counter += 1
 
             elif event.type == self.events["UPDATEDIFFICULTY"]:
                 self.difficulty += 1
 
+            elif event.type == self.events["HEAL"]:
+                self.update_player_hp(1)
+
             elif event.type == self.events["RECHARGEMUNITION"]:
-                self.PLAYER.munition += 10 - self.PLAYER.munition
+                self.update_player_munition(1)
 
             elif event.type == self.events["DISABLESHIELD"]:
                 self.shield = False
+                self.shield_counter = 0
+
+            elif event.type == self.events["DISABLEDOUBLE"]:
+                self.double = False
+                self.double_counter = 0
 
 
     def handle_collisions(self):
@@ -150,20 +196,32 @@ class Game():
                 if pygame.sprite.collide_rect(self.PLAYER, k):
                     if not self.lose:
                         if k.type == "hp":
-                            self.PLAYER.hp += 3
-                            if self.PLAYER.hp > 10:
-                                self.PLAYER.hp = 10 
+                            self.update_player_hp(3)
+                            self.update_player_munition(3)
                         elif k.type == "explosion":
                             for j in self.enemies:
-                                self.points += 1
-                                self.PLAYER.munition = 10
+                                if not self.double:
+                                    self.points += 1
+                                else:
+                                    self.points += 2
                                 self.add_explosion(j.rect.center)
                                 j.kill()
                         elif k.type == "shield":
                             self.shield = True
-                            self.add_timer("DISABLESHIELD", 3000)
+                            self.add_timer("DISABLESHIELD", self.MAX_SHIELD * 1000)
+                        elif k.type == "points":
+                            if not self.double:
+                                self.points += 50
+                            else:
+                                self.points += 100
+                        elif k.type == "double":
+                            self.double = True
+                            self.add_timer("DISABLEDOUBLE", self.MAX_DOUBLE * 1000)
                         k.kill()
-                        self.points += 3
+                        if not self.double:
+                            self.points += 3
+                        else:
+                            self.points += 6
 
         for j in self.enemies:
             if pygame.sprite.spritecollideany(j, self.shots):
@@ -172,7 +230,14 @@ class Game():
                         j.kill()
                         k.c += 1
                         self.add_explosion(j.rect.center)
-                        self.points += 1
+                        if (randint(0, 4) == 4):
+                            self.update_player_hp(2)
+                        if (randint(0, 4) == 4):
+                            self.update_player_munition(2)
+                        if not self.double:
+                            self.points += 2
+                        else:
+                            self.points += 4
 
 
     def save_record(self):

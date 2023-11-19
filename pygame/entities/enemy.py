@@ -4,14 +4,14 @@ import pygame
 from pygame.locals import *
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, width: int, height: int, difficulty: int, player_coord: tuple):
+    def __init__(self, width: int, height: int, difficulty: int, player_coord: tuple, img_array: list):
         super().__init__()
-
-        array = ["images/bowser.png", "images/super.png", "images/turtle.png", "images/magikoopa.png", "images/koopa_troopa.png"]
-        self.img: pygame.Surface = pygame.image.load(array[random.randint(0, 4)]).convert_alpha()
-        self.img = pygame.transform.scale(self.img, (50, 50 * self.img.get_height() / self.img.get_width()))
         
+        self.img = img_array[random.randint(0, 4)]
+        size = random.randint(25, 75)
+        self.img = pygame.transform.scale(self.img, (size, size * self.img.get_height() / self.img.get_width()))
         self.rect: pygame.Rect = self.img.get_rect()
+
         self.WIDTH: int = width
         self.HEIGHT: int = height
         self.player_coord: tuple = player_coord
@@ -36,7 +36,7 @@ class Enemy(pygame.sprite.Sprite):
         width = 0
         height = 0
         
-        speed = 1 + self.difficulty / 5
+        speed = 1 + random.randint(0, int(self.difficulty / 5))
 
         if self.player_coord != self.rect.center:
             dif: int = math.fabs(self.player_coord[0] - self.rect.center[0])
