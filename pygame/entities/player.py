@@ -3,10 +3,12 @@ from pygame.locals import *
 
 DEFAULT_IMG_SIZE = (75, 75)
 
+# recebe as dimensões da tela do jogo
 class Player(pygame.sprite.Sprite):
     def __init__(self, width: int, height: int):
         super().__init__()
 
+        # array de imagens do player
         array = ["down_1", "down_2", "horizontal_1", "horizontal_2", "stopped", "up_1", "up_2"]
         self.imgs: list = []
         for k in array:
@@ -19,8 +21,10 @@ class Player(pygame.sprite.Sprite):
 
         self.img: pygame.Surface
         self.rect: pygame.Rect = pygame.Rect(self.WIDTH/2, self.HEIGHT/2, DEFAULT_IMG_SIZE[0], DEFAULT_IMG_SIZE[1])
+        # jogador inicia o jogo parado
         self.set_img(self.imgs[4])
 
+        # munição e hp do jogador
         self.MAX_MUNITION = 10
         self.MAX_HP = 10
 
@@ -31,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.c = 0
 
 
+    # atualiza a posição do jogador com base nas teclas pressionadas
     def update(self):
         speed: int = 7
         pressed_keys = pygame.key.get_pressed()
@@ -59,6 +64,7 @@ class Player(pygame.sprite.Sprite):
             self.set_img(self.imgs[2])
             self.rect.move_ip(speed, 0)
 
+        # se o jogador chegou nas bordas do mapa, ele morre
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > self.WIDTH:
@@ -68,11 +74,13 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > self.HEIGHT:
             self.rect.bottom = self.HEIGHT
 
-    
+
+    # desenha o player    
     def draw(self, surface: pygame.Surface):
         surface.blit(self.img, self.rect)
 
     
+    # muda a imagem do player
     def set_img(self, img: pygame.Surface, flip=False):
         center = self.rect.center
         self.img = img
@@ -80,3 +88,17 @@ class Player(pygame.sprite.Sprite):
             self.img = pygame.transform.flip(self.img, True, False)
         self.rect = self.img.get_rect()
         self.rect.center = center
+
+
+    # incrementa a vida do jogador (até o máximo de hp)
+    def update_hp(self, plus: int):
+        self.hp += plus
+        if self.hp > self.MAX_HP:
+            self.hp = self.MAX_HP
+
+
+    # incrementa a munição do jogador (até o máximo de munição)
+    def update_munition(self, plus: int):
+        self.munition += plus
+        if self.munition > self.MAX_MUNITION:
+            self.munition = self.MAX_MUNITION
