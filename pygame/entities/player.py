@@ -44,6 +44,7 @@ class Player(pygame.sprite.Sprite):
         if self.c == 5:
             self.c = 0
 
+        # muda a imagem do jogador de acordo com as teclas pressionadas
         if pressed_keys[K_UP] or pressed_keys[K_w]:
             self.way = 0
             self.set_img(self.imgs[5])
@@ -64,7 +65,7 @@ class Player(pygame.sprite.Sprite):
             self.set_img(self.imgs[2])
             self.rect.move_ip(speed, 0)
 
-        # se o jogador chegou nas bordas do mapa, ele morre
+        # se o jogador passa das bordas do mapa, ele volta para a posição anterior
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > self.WIDTH:

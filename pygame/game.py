@@ -28,7 +28,7 @@ class Game():
         self.difficulty: int = 1
         self.collide_time: int = 0
 
-        # arquivo binário de recorde
+        # lê o arquivo binário de recorde e guarda o valor na variável record
         self.URL: str = "record.dat"
         self.file = open(self.URL, mode="rb")
         self.record: int = 0
@@ -40,6 +40,7 @@ class Game():
 
         # mais atributos do jogo
         self.lose: bool = False
+        self.started: bool = False
         self.shield: bool = False
         self.MAX_SHIELD: int = 5
         self.shield_counter: int = 0

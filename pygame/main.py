@@ -49,38 +49,45 @@ def create_rect(coord: tuple, width: int, height: int, color: tuple):
 def update_screen():
     DISPLAYSURF.blit(img, (0,0))
 
+    # se o jogo ainda não começou, espera o jogador pressionar enter to start
+    if not game.started:
+        write_in_screen(f"Welcome to MARIO SHOOTING!", game.WIDTH/2 - 200, game.HEIGHT/2 - 50) 
+        write_in_screen(f"Press [Enter] to start!", game.WIDTH/2 - 200, game.HEIGHT/2)
+
     # se não perdeu, escreve na tela o tempo de jogo, sua pontuação,
     # a dificuldade atual, sua vida e sua munição, bem como atualiza as posições dos inimigos
-    if not game.lose:
-        write_in_screen(f"Time: {game.counter}s", WIDTH - 200, 50)
-        write_in_screen(f"SCORE: {game.points}", WIDTH - 200, 100)
-        write_in_screen(f"DIFFICULTY: {game.difficulty}", WIDTH - 250, HEIGHT - 50)
-        write_in_screen(f"LIFE: ", 50, 50, RED) 
-        write_in_screen(f"FIRE: ", 50, 100, YELLOW) 
+    if not game.lose and game.started:
+        write_in_screen(f"Time: {game.counter}s", 50, 50)
+        write_in_screen(f"SCORE: {game.points}", 50, 100)
+        write_in_screen(f"DIFFICULTY: {game.difficulty}", 50, HEIGHT - 50)
+        write_in_screen(f"LIFE: ", WIDTH - 325, 50, RED) 
+        write_in_screen(f"FIRE: ", WIDTH - 325, 100, YELLOW) 
 
         # barras de vida e munição
-        create_rect((130, 50), game.PLAYER.hp * 20, 20, RED)
+        create_rect((WIDTH - 250, 50), game.PLAYER.hp * 20, 20, RED)
 
-        create_rect((130, 100), game.PLAYER.munition * 20, 20, YELLOW)
+        create_rect((WIDTH - 250, 100), game.PLAYER.munition * 20, 20, YELLOW)
         
+        # atualiza as entidades
         game.PLAYER.update()
         game.PLAYER.draw(DISPLAYSURF)
         for enemy in game.enemies:
+            # antes de atualizar as sprites inimigas, atualiza a posição do jogador em cada inimigo, para que eles saibam onde persegui-lo
             enemy.update_player_coord(game.PLAYER.rect.center)
 
-    game.all_sprites.update()
-    for entity in game.all_sprites:
-        entity.draw(DISPLAYSURF)
+        game.all_sprites.update()
+        for entity in game.all_sprites:
+            entity.draw(DISPLAYSURF)
 
-    # se shield está ativo, isso é informado ao jogador
-    if game.shield:
-        write_in_screen(f"SHIELD ACTIVE!", game.WIDTH/2 - 100, 50, color=BLUE, font=LARGE_FONT)
-        create_rect((game.WIDTH/2 - 100, 100), (game.MAX_SHIELD - game.shield_counter) * 300/game.MAX_SHIELD, 20, BLUE)
+        # se shield está ativo, isso é informado ao jogador
+        if game.shield:
+            write_in_screen(f"SHIELD ON!", game.WIDTH/2 - 100, 50, color=BLUE, font=LARGE_FONT)
+            create_rect((game.WIDTH/2 - 100, 100), (game.MAX_SHIELD - game.shield_counter) * 250/game.MAX_SHIELD, 20, BLUE)
 
-    # se double score está ativo, isso é informado ao jogador
-    elif game.double:
-        write_in_screen(f"2x SCORE!", game.WIDTH/2 - 100, 50, color=YELLOW, font=LARGE_FONT)
-        create_rect((game.WIDTH/2 - 100, 100), (game.MAX_DOUBLE - game.double_counter) * 300/game.MAX_DOUBLE, 20, YELLOW)
+        # se double score está ativo, isso é informado ao jogador
+        elif game.double:
+            write_in_screen(f"2x SCORE!", game.WIDTH/2 - 100, 50, color=YELLOW, font=LARGE_FONT)
+            create_rect((game.WIDTH/2 - 100, 100), (game.MAX_DOUBLE - game.double_counter) * 250/game.MAX_DOUBLE, 20, YELLOW)
 
     # se jogador perdeu, escreve na tela o recorde, a pontuação e uma mensagem de restart
     if game.lose:
@@ -91,6 +98,8 @@ def update_screen():
 
         write_in_screen(f"Record: {game.record}", game.WIDTH/2 - 100, game.HEIGHT/2 - 50)
         write_in_screen(f"Press [Enter] to restart", game.WIDTH/2 - 200, game.HEIGHT/2) 
+
+    pygame.display.update()
 
 
 # ícone do jogo
@@ -113,14 +122,17 @@ while running:
             # ESC para sair do jogo
             if event.key == pygame.K_ESCAPE:
                 running = False
-            # Enter para reiniciar
+            # Enter para iniciar e reiniciar
             if event.key == pygame.K_RETURN:
                 if game.lose:
                     game.save_record()
                     game = Game(WIDTH, HEIGHT)
 
+                if not game.started:
+                    game.started = True
+
     # se não perdeu, trata os eventos e colisões
-    if not game.lose:
+    if not game.lose and game.started:
         game.handle_events(events)
         game.handle_collisions()
 
@@ -128,12 +140,11 @@ while running:
     update_screen()
 
     # define o FPS
-    pygame.display.update()
     framesPerSec.tick(FPS)
 
 # quando o jogo termina, salva o recorde
 game.save_record()
 
-# sai do jogo
+# sai do jogo e para o programa
 pygame.quit()
 sys.exit()

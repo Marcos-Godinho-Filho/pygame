@@ -56,5 +56,6 @@ class Item(pygame.sprite.Sprite):
             self.c = 0
 
 
+    # desenha o item na surface
     def draw(self, surface: pygame.Surface):
         surface.blit(self.img, self.rect)

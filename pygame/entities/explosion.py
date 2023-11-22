@@ -32,6 +32,7 @@ class Explosion(pygame.sprite.Sprite):
     
     # atualiza a imagem com base na array 
     def update_img(self):
+        # muda as imagens de acordo com um contador (para dar ideia de movimento -> uma após a outra)
         if self.current_img == 1:
             self.current_img = 9
             self.kill()
