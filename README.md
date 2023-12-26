@@ -1,4 +1,4 @@
 ### Mario shooting game
 ---
 
-A game that has items to collect and enemies to shoot.
+A simple game made with pygame. Collect items to get stronger and survive Mario enemies. Beat your own record. Have fun!
